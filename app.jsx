@@ -308,11 +308,17 @@ const DashboardView = ({ setView, userData }) => {
 const WhatsAppView = ({ setView, userData, setUserData }) => {
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
-    
+    const inputRef = useRef(null);
+
     const [messages, setMessages] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
     const [answers, setAnswers] = useState({});
-    
+    const [inputText, setInputText] = useState('');
+    // tracks which question key is awaiting a free-text answer (null = free chat)
+    const [pendingKey, setPendingKey] = useState(null);
+    // tracks the index of the next bot step to run after a free-text answer
+    const [pendingNextStep, setPendingNextStep] = useState(null);
+
     const QUESTIONS = [
         { id: 1, text: "Hi! I'm Benzac Buddy, your AI Acne Coach. Let's start your clear skin journey. Ready for your first skin scan?", options: ["Ready!"], key: 'ready' },
         { id: 2, text: "Where are your breakouts?\nThis helps identify acne pattern and severity.", options: ["Forehead", "Cheeks", "Chin", "Nose", "Jawline", "Multiple areas"], key: 'area' },
@@ -331,20 +337,8 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                 title: "Active Spot Breakout Routine",
                 benefit: "The Power Patch targets active spots directly — absorbing impurities and reducing inflammation overnight.",
                 products: [
-                    {
-                        name: "Step 1: Benzac Power Patch",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Benzac-Fast-Acting-Ultra-Thin-Invisible-Dermatologist-Tested/dp/B0F23YL442" },
-                            { name: "Zepto", url: "https://www.zepto.com/pn/benzac-power-fast-acting-pimple-patch/pvid/f828cef4-77f3-4fb6-ac82-1c751d459019" }
-                        ]
-                    },
-                    {
-                        name: "Step 2: Benzac AC 2.5% Gel (PM)",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/BENZAC-AC-2-5-Tube-Gel/dp/B09V3SWKM5" },
-                            { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-2.5-tube-of-30gm-gel/prid/647788" }
-                        ]
-                    }
+                    { name: "Step 1: Benzac Power Patch", links: [{ name: "Amazon", url: "https://www.amazon.in/Benzac-Fast-Acting-Ultra-Thin-Invisible-Dermatologist-Tested/dp/B0F23YL442" }, { name: "Zepto", url: "https://www.zepto.com/pn/benzac-power-fast-acting-pimple-patch/pvid/f828cef4-77f3-4fb6-ac82-1c751d459019" }] },
+                    { name: "Step 2: Benzac AC 2.5% Gel (PM)", links: [{ name: "Amazon", url: "https://www.amazon.in/BENZAC-AC-2-5-Tube-Gel/dp/B09V3SWKM5" }, { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-2.5-tube-of-30gm-gel/prid/647788" }] }
                 ]
             };
         } else if (ans.extra === "Marks after pimples") {
@@ -352,20 +346,8 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                 title: "Post-Acne Marks Routine",
                 benefit: "The Skin Restore Patch fades dark marks left behind by pimples, working gently while you sleep.",
                 products: [
-                    {
-                        name: "Step 1: Benzac Power Patch Skin Restore",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/s?k=Benzac+Power+Patch+Skin+Restore" },
-                            { name: "Zepto", url: "https://www.zeptonow.com/search?query=Benzac%20Power%20Patch%20Skin%20Restore" }
-                        ]
-                    },
-                    {
-                        name: "Step 2: Benzac AC 5% Gel Wash (AM)",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Benzac-Ac-5-Bottle-100ml/dp/B0CD1RSQLT" },
-                            { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-bottle-of-100-ml-gel-wash/prid/666922" }
-                        ]
-                    }
+                    { name: "Step 1: Benzac Power Patch Skin Restore", links: [{ name: "Amazon", url: "https://www.amazon.in/s?k=Benzac+Power+Patch+Skin+Restore" }, { name: "Zepto", url: "https://www.zeptonow.com/search?query=Benzac%20Power%20Patch%20Skin%20Restore" }] },
+                    { name: "Step 2: Benzac AC 5% Gel Wash (AM)", links: [{ name: "Amazon", url: "https://www.amazon.in/Benzac-Ac-5-Bottle-100ml/dp/B0CD1RSQLT" }, { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-bottle-of-100-ml-gel-wash/prid/666922" }] }
                 ]
             };
         } else if (ans.skinType === "Dry") {
@@ -373,20 +355,8 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                 title: "Gentle Acne Routine (Dry Skin)",
                 benefit: "The gentler 2.5% formula treats acne without over-drying, ideal for skin that's already feeling tight.",
                 products: [
-                    {
-                        name: "Step 1: Benzac AC 2.5% Gel (PM)",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/BENZAC-AC-2-5-Tube-Gel/dp/B09V3SWKM5" },
-                            { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-2.5-tube-of-30gm-gel/prid/647788" }
-                        ]
-                    },
-                    {
-                        name: "Step 2: Benzac Power Patch (for active spots)",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Benzac-Fast-Acting-Ultra-Thin-Invisible-Dermatologist-Tested/dp/B0F23YL442" },
-                            { name: "Zepto", url: "https://www.zepto.com/pn/benzac-power-fast-acting-pimple-patch/pvid/f828cef4-77f3-4fb6-ac82-1c751d459019" }
-                        ]
-                    }
+                    { name: "Step 1: Benzac AC 2.5% Gel (PM)", links: [{ name: "Amazon", url: "https://www.amazon.in/BENZAC-AC-2-5-Tube-Gel/dp/B09V3SWKM5" }, { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-2.5-tube-of-30gm-gel/prid/647788" }] },
+                    { name: "Step 2: Benzac Power Patch (for active spots)", links: [{ name: "Amazon", url: "https://www.amazon.in/Benzac-Fast-Acting-Ultra-Thin-Invisible-Dermatologist-Tested/dp/B0F23YL442" }, { name: "Zepto", url: "https://www.zepto.com/pn/benzac-power-fast-acting-pimple-patch/pvid/f828cef4-77f3-4fb6-ac82-1c751d459019" }] }
                 ]
             };
         } else {
@@ -394,27 +364,9 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                 title: "Full Benzac AM/PM Routine",
                 benefit: "A complete routine — cleanse, treat, and patch — gives your skin the best chance to clear up fast.",
                 products: [
-                    {
-                        name: "Step 1: Benzac AC 5% Gel Wash (AM Cleanser)",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Benzac-Ac-5-Bottle-100ml/dp/B0CD1RSQLT" },
-                            { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-bottle-of-100-ml-gel-wash/prid/666922" }
-                        ]
-                    },
-                    {
-                        name: "Step 2: Benzac AC 5% Gel (PM Treatment)",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/BENZAC-AC-5-Tube-Gel/dp/B09V3SXW86" },
-                            { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-gel/prid/646589" }
-                        ]
-                    },
-                    {
-                        name: "Step 3: Benzac Power Patch (overnight)",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Benzac-Fast-Acting-Ultra-Thin-Invisible-Dermatologist-Tested/dp/B0F23YL442" },
-                            { name: "Zepto", url: "https://www.zepto.com/pn/benzac-power-fast-acting-pimple-patch/pvid/f828cef4-77f3-4fb6-ac82-1c751d459019" }
-                        ]
-                    }
+                    { name: "Step 1: Benzac AC 5% Gel Wash (AM Cleanser)", links: [{ name: "Amazon", url: "https://www.amazon.in/Benzac-Ac-5-Bottle-100ml/dp/B0CD1RSQLT" }, { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-bottle-of-100-ml-gel-wash/prid/666922" }] },
+                    { name: "Step 2: Benzac AC 5% Gel (PM Treatment)", links: [{ name: "Amazon", url: "https://www.amazon.in/BENZAC-AC-5-Tube-Gel/dp/B09V3SXW86" }, { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-gel/prid/646589" }] },
+                    { name: "Step 3: Benzac Power Patch (overnight)", links: [{ name: "Amazon", url: "https://www.amazon.in/Benzac-Fast-Acting-Ultra-Thin-Invisible-Dermatologist-Tested/dp/B0F23YL442" }, { name: "Zepto", url: "https://www.zepto.com/pn/benzac-power-fast-acting-pimple-patch/pvid/f828cef4-77f3-4fb6-ac82-1c751d459019" }] }
                 ]
             };
         }
@@ -441,24 +393,81 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
-    const handleOptionClick = (option, key) => {
-        const lastMsg = messages[messages.length - 1];
-        if (lastMsg.options && lastMsg.options.includes(option)) {
-            // Remove options from UI
-            setMessages(prev => {
-                const newMsgs = [...prev];
-                newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], options: null };
-                newMsgs.push({ id: Date.now(), type: 'user', text: option });
-                return newMsgs;
-            });
-            
+    // Advance flow after an answer (button or typed)
+    const processAnswer = (text, key, nextStepIdx, newAnswers) => {
+        // Push user message and clear options on last bot msg
+        setMessages(prev => {
+            const newMsgs = [...prev];
+            newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], options: null, allowOther: false };
+            newMsgs.push({ id: Date.now(), type: 'user', text });
+            return newMsgs;
+        });
+        setPendingKey(null);
+        setPendingNextStep(null);
+        advanceBot(nextStepIdx, newAnswers);
+    };
+
+    const handleOptionClick = (option, key, lastMsg) => {
+        const currentStepIdx = QUESTIONS.findIndex(q => q.id === lastMsg.id);
+        const newAnswers = { ...answers };
+        if (key) newAnswers[key] = option;
+        setAnswers(newAnswers);
+        processAnswer(option, key, currentStepIdx + 1, newAnswers);
+    };
+
+    // "Other" button clicked — focus input and wait for typed answer
+    const handleOtherClick = (key, lastMsg) => {
+        const currentStepIdx = QUESTIONS.findIndex(q => q.id === lastMsg.id);
+        setPendingKey(key);
+        setPendingNextStep(currentStepIdx + 1);
+        // Remove options so they don't stay as clickable
+        setMessages(prev => {
+            const newMsgs = [...prev];
+            newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], options: null, allowOther: false };
+            return newMsgs;
+        });
+        // Add a bot prompt
+        setIsTyping(true);
+        setTimeout(() => {
+            setIsTyping(false);
+            setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: "Sure! Go ahead and type your answer below 👇", isPrompt: true }]);
+            inputRef.current?.focus();
+        }, 600);
+    };
+
+    // Free-chat AI responses for messages outside the question flow
+    const getFreeChatReply = (text) => {
+        const t = text.toLowerCase();
+        if (t.includes('thank') || t.includes('thanks')) return "You're so welcome! 😊 Remember, consistency is key — stick to your routine and we'll see results together!";
+        if (t.includes('hurt') || t.includes('pain') || t.includes('painful')) return "Ouch, painful breakouts are the worst 😔 Try not to touch or pop them — I know it's tempting! The Benzac Power Patch is great for those. Keep going, your skin will thank you! 💪";
+        if (t.includes('work') || t.includes('effective') || t.includes('result')) return "Great question! Most people start seeing visible improvements in 1–2 weeks with consistent use. Your weekly scan will show us the real data! 📊";
+        if (t.includes('stress') || t.includes('anxious') || t.includes('worried')) return "I hear you — stress really does affect your skin. Try to get some rest and stay hydrated 💧 You're doing great just by being here and taking care of yourself. 💕";
+        if (t.includes('sleep')) return "Sleep is SO important for skin healing! Aim for 7–8 hours. Your skin repairs itself while you sleep 🌙 That's when your Benzac routine does its best work.";
+        if (t.includes('diet') || t.includes('food') || t.includes('eat')) return "Food can definitely affect breakouts! Try to reduce dairy and sugar if you can. Drink lots of water too 💧 We track this through your weekly check-ins.";
+        if (t.includes('hello') || t.includes('hi') || t.includes('hey')) return "Hey there! 👋 How's your skin feeling today? Remember to follow your Benzac routine morning and evening!";
+        return "Got it! Thanks for sharing that with me 😊 Every bit of info helps me personalise your journey better. Keep going — you're doing amazing! 🌟";
+    };
+
+    // Main send handler — handles both free chat and pending question answers
+    const handleSend = () => {
+        const text = inputText.trim();
+        if (!text) return;
+        setInputText('');
+
+        if (pendingKey !== null) {
+            // This typed message answers a pending question
             const newAnswers = { ...answers };
-            if (key) newAnswers[key] = option;
+            newAnswers[pendingKey] = text;
             setAnswers(newAnswers);
-            
-            // Advance to next question
-            const currentStepIdx = QUESTIONS.findIndex(q => q.id === lastMsg.id);
-            advanceBot(currentStepIdx + 1, newAnswers);
+            processAnswer(text, pendingKey, pendingNextStep, newAnswers);
+        } else {
+            // Free chat — just add message and respond naturally
+            setMessages(prev => [...prev, { id: Date.now(), type: 'user', text }]);
+            setIsTyping(true);
+            setTimeout(() => {
+                setIsTyping(false);
+                setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: getFreeChatReply(text) }]);
+            }, 1000);
         }
     };
 
@@ -468,59 +477,39 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
             const reader = new FileReader();
             reader.onload = (event) => {
                 const imgData = event.target.result;
-                // Remove upload button from previous message
                 setMessages(prev => {
                     const newMsgs = [...prev];
                     newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], isUpload: false };
                     newMsgs.push({ id: Date.now(), type: 'user', isImage: true, image: imgData });
                     return newMsgs;
                 });
-                
-                // Start AI analysis phase
                 setIsTyping(true);
                 setTimeout(() => {
                     setIsTyping(false);
-                    
                     if (userData.history.length === 0) {
                         setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: "Analyzing your skin... This usually takes about 15 seconds." }]);
-                        
                         setIsTyping(true);
                         setTimeout(() => {
                             setIsTyping(false);
                             const rec = getRecommendation(answers);
-                            
-                            setUserData(prev => ({
-                                ...prev,
-                                history: [{ week: 0, date: 'Day 1', score: 58, description: `Baseline: ${rec.title}`, change: 0, img: imgData }]
-                            }));
-
+                            setUserData(prev => ({ ...prev, history: [{ week: 0, date: 'Day 1', score: 58, description: `Baseline: ${rec.title}`, change: 0, img: imgData }] }));
                             const productString = rec.products.map(p => `🔹 **${p.name}**\n   🛒 [${p.links[0].name}](${p.links[0].url}) | [${p.links[1].name}](${p.links[1].url})`).join('\n\n');
-
                             setMessages(prev => [
-                                ...prev, 
+                                ...prev,
                                 { id: Date.now(), type: 'bot', isCard: true, cardType: 'baseline', score: 58 },
                                 { id: Date.now(), type: 'bot', text: `I know dealing with breakouts can be really frustrating, especially when they just won't budge. But hey — you took the first step, and that matters! 💕\n\nBased on everything you've shared, here's a personalised Benzac routine I'd recommend to help your skin heal:\n\n✨ **${rec.title}**\n\n${productString}\n\n**Why this works:** ${rec.benefit}\n\nStart with this routine and we'll check in every day. Small steps lead to big changes! 🌟`, options: ["Simulate Next Day"] }
                             ]);
                         }, 3000);
                     } else {
-                        // Week 1 scan analysis
                         setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: "Comparing with your Day 1 photo..." }]);
-                        
                         setIsTyping(true);
                         setTimeout(() => {
                             setIsTyping(false);
-                            setUserData(prev => ({
-                                ...prev,
-                                history: [
-                                    ...prev.history,
-                                    { week: 1, date: 'Day 7', score: 71, description: 'Inflammation ↓, Redness ↓. Healing Progress +13', change: 13, img: imgData }
-                                ]
-                            }));
-
+                            setUserData(prev => ({ ...prev, history: [...prev.history, { week: 1, date: 'Day 7', score: 71, description: 'Inflammation ↓, Redness ↓. Healing Progress +13', change: 13, img: imgData }] }));
                             setMessages(prev => [
-                                ...prev, 
+                                ...prev,
                                 { id: Date.now(), type: 'bot', isCard: true, cardType: 'week1' },
-                                { id: Date.now(), type: 'bot', text: "Keep using your AM/PM routine. You're doing great!", options: ["View Full Dashboard"] }
+                                { id: Date.now(), type: 'bot', text: "Keep using your routine. You're doing great!", options: ["View Full Dashboard"] }
                             ]);
                         }, 3000);
                     }
@@ -531,46 +520,24 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
     };
 
     const handleSpecialOption = (option) => {
+        const clearLast = () => setMessages(prev => { const n = [...prev]; n[n.length-1] = {...n[n.length-1], options: null}; n.push({id: Date.now(), type:'user', text: option}); return n; });
         if (option === "Simulate Next Day") {
-            setMessages(prev => {
-                const newMsgs = [...prev];
-                newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], options: null };
-                newMsgs.push({ id: Date.now(), type: 'user', text: option });
-                return newMsgs;
-            });
+            clearLast();
             setIsTyping(true);
-            setTimeout(() => {
-                setIsTyping(false);
-                setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: "Good morning! ☀️ Did you complete your Benzac AM routine today?", options: ["✅ Completed", "Skip Today"] }]);
-            }, 1000);
+            setTimeout(() => { setIsTyping(false); setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: "Good morning! ☀️ Did you complete your Benzac AM routine today?", options: ["✅ Completed", "Skip Today"] }]); }, 1000);
         } else if (option === "✅ Completed") {
-            setMessages(prev => {
-                const newMsgs = [...prev];
-                newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], options: null };
-                newMsgs.push({ id: Date.now(), type: 'user', text: option });
-                return newMsgs;
-            });
+            clearLast();
             setUserData(prev => ({ ...prev, points: prev.points + 10 }));
             setIsTyping(true);
-            setTimeout(() => {
-                setIsTyping(false);
-                setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: "Awesome! +10 Points to your Rewards Wallet.", options: ["Simulate Week 1 Scan"] }]);
-            }, 1000);
-        } else if (option === "Simulate Week 1 Scan") {
-            setMessages(prev => {
-                const newMsgs = [...prev];
-                newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], options: null };
-                newMsgs.push({ id: Date.now(), type: 'user', text: option });
-                return newMsgs;
-            });
+            setTimeout(() => { setIsTyping(false); setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: "Awesome! +10 Points to your Rewards Wallet. 🎉", options: ["Simulate Week 1 Scan"] }]); }, 1000);
+        } else if (option === "Skip Today") {
+            clearLast();
             setIsTyping(true);
-            setTimeout(() => {
-                setIsTyping(false);
-                setMessages(prev => [
-                    ...prev, 
-                    { id: Date.now(), type: 'bot', text: "📸 Weekly Skin Check Time!\nUpload a fresh photo in natural lighting so I can measure your progress.", isUpload: true }
-                ]);
-            }, 1500);
+            setTimeout(() => { setIsTyping(false); setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: "No worries! Life happens 😊 Try to get back on track tonight. Even one application makes a difference. You've got this! 💪" }]); }, 1000);
+        } else if (option === "Simulate Week 1 Scan") {
+            clearLast();
+            setIsTyping(true);
+            setTimeout(() => { setIsTyping(false); setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: "📸 Weekly Skin Check Time!\nUpload a fresh photo in natural lighting so I can measure your progress.", isUpload: true }]); }, 1500);
         } else if (option === "View Full Dashboard") {
             setView('dashboard');
         }
@@ -599,7 +566,7 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                 <div className="text-center my-2">
                     <span className="bg-[#d9ede1] text-xs px-3 py-1 rounded-lg text-gray-600 shadow-sm">Today</span>
                 </div>
-                
+
                 {messages.map((msg, idx) => (
                     <div key={idx} className={`flex flex-col ${msg.type === 'user' ? 'items-end' : 'items-start'}`}>
                         {msg.text && (
@@ -608,7 +575,7 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                                 <span className="text-[10px] text-gray-400 float-right ml-3 mt-2">{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} {msg.type === 'user' && <i className="fa-solid fa-check-double text-blue-500 ml-1"></i>}</span>
                             </div>
                         )}
-                        
+
                         {msg.isImage && (
                             <div className="max-w-[70%] bg-[#dcf8c6] rounded-lg p-1 shadow-sm rounded-tr-none mt-1">
                                 <img src={msg.image} className="rounded w-full object-cover h-48" />
@@ -619,10 +586,8 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                         {msg.isUpload && (
                             <div className="mt-2 w-[80%] max-w-sm">
                                 <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
-                                <button 
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="w-full bg-benzac-purple text-white font-semibold py-3 px-4 rounded-xl text-sm shadow-sm hover:bg-benzac-dark transition flex items-center justify-center gap-2"
-                                >
+                                <button onClick={() => fileInputRef.current?.click()}
+                                    className="w-full bg-benzac-purple text-white font-semibold py-3 px-4 rounded-xl text-sm shadow-sm hover:bg-benzac-dark transition flex items-center justify-center gap-2">
                                     <i className="fa-solid fa-camera"></i> Take or Upload Photo
                                 </button>
                             </div>
@@ -630,9 +595,7 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
 
                         {msg.isCard && msg.cardType === 'baseline' && (
                             <div className="max-w-[85%] bg-white rounded-xl shadow-md overflow-hidden mt-1 border border-gray-100">
-                                <div className="bg-benzac-dark text-white p-3 text-center">
-                                    <h3 className="font-bold">Initial Skin Scan</h3>
-                                </div>
+                                <div className="bg-benzac-dark text-white p-3 text-center"><h3 className="font-bold">Initial Skin Scan</h3></div>
                                 <div className="p-4 space-y-3">
                                     <div className="flex justify-between items-center border-b pb-2">
                                         <span className="text-sm text-gray-600">Acne Score</span>
@@ -649,40 +612,36 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
 
                         {msg.isCard && msg.cardType === 'week1' && (
                             <div className="max-w-[85%] bg-white rounded-xl shadow-md overflow-hidden mt-1 border border-gray-100">
-                                <div className="bg-benzac-purple text-white p-3 text-center">
-                                    <h3 className="font-bold">Weekly Progress Scan</h3>
-                                </div>
+                                <div className="bg-benzac-purple text-white p-3 text-center"><h3 className="font-bold">Weekly Progress Scan</h3></div>
                                 <div className="p-4 space-y-3">
                                     <div className="flex justify-between items-center border-b pb-2">
-                                        <div className="text-center">
-                                            <div className="text-xs text-gray-400">Previous</div>
-                                            <div className="text-lg font-bold text-gray-500 line-through">58</div>
-                                        </div>
+                                        <div className="text-center"><div className="text-xs text-gray-400">Previous</div><div className="text-lg font-bold text-gray-500 line-through">58</div></div>
                                         <i className="fa-solid fa-arrow-right text-green-500 mx-2"></i>
-                                        <div className="text-center">
-                                            <div className="text-xs text-benzac-purple font-bold">New Score</div>
-                                            <div className="text-2xl font-bold text-benzac-purple">71</div>
-                                        </div>
+                                        <div className="text-center"><div className="text-xs text-benzac-purple font-bold">New Score</div><div className="text-2xl font-bold text-benzac-purple">71</div></div>
                                     </div>
-                                    <div className="text-center text-sm font-bold text-green-600 py-1 bg-green-50 rounded">
-                                        +13 Points Improvement! 🎉
-                                    </div>
+                                    <div className="text-center text-sm font-bold text-green-600 py-1 bg-green-50 rounded">+13 Points Improvement! 🎉</div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Options */}
+                        {/* Quick-reply option buttons + "Other" */}
                         {msg.options && (
                             <div className="flex flex-col gap-2 mt-2 w-[85%] max-w-sm">
                                 {msg.options.map((opt, i) => (
-                                    <button 
-                                        key={i} 
-                                        onClick={() => msg.key ? handleOptionClick(opt, msg.key) : handleSpecialOption(opt)}
-                                        className="bg-white border-2 border-benzac-purple text-benzac-purple font-semibold py-2 px-4 rounded-xl text-sm shadow-sm hover:bg-benzac-light transition text-left"
-                                    >
+                                    <button key={i}
+                                        onClick={() => msg.key ? handleOptionClick(opt, msg.key, msg) : handleSpecialOption(opt)}
+                                        className="bg-white border-2 border-benzac-purple text-benzac-purple font-semibold py-2 px-4 rounded-xl text-sm shadow-sm hover:bg-benzac-light transition text-left">
                                         {opt}
                                     </button>
                                 ))}
+                                {/* "Other" only for question messages (has a key), not special action buttons */}
+                                {msg.key && (
+                                    <button
+                                        onClick={() => handleOtherClick(msg.key, msg)}
+                                        className="bg-gray-50 border-2 border-gray-300 text-gray-600 font-semibold py-2 px-4 rounded-xl text-sm shadow-sm hover:bg-gray-100 transition text-left flex items-center gap-2">
+                                        <i className="fa-solid fa-pencil text-xs"></i> Other — type your own answer
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -700,19 +659,34 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="bg-[#f0f0f0] p-2 flex items-center gap-2">
-                <i className="fa-regular fa-face-smile text-gray-500 text-xl ml-2"></i>
-                <div className="bg-white flex-1 rounded-full py-2 px-4 text-sm text-gray-400 shadow-sm border border-gray-200">
-                    Message
-                </div>
-                <div className="w-10 h-10 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-sm">
-                    <i className="fa-solid fa-microphone"></i>
-                </div>
+            {/* ── FUNCTIONAL INPUT BAR ── */}
+            <div className="bg-[#f0f0f0] p-2 flex items-end gap-2">
+                <i className="fa-regular fa-face-smile text-gray-500 text-xl ml-2 mb-2.5"></i>
+                <textarea
+                    ref={inputRef}
+                    rows={1}
+                    value={inputText}
+                    onChange={e => { setInputText(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px'; }}
+                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                    placeholder={pendingKey ? "Type your answer..." : "Message"}
+                    className="bg-white flex-1 rounded-2xl py-2 px-4 text-sm text-gray-800 shadow-sm border border-gray-200 resize-none outline-none leading-relaxed"
+                    style={{minHeight: '40px', maxHeight: '100px'}}
+                />
+                {inputText.trim() ? (
+                    <button onClick={handleSend}
+                        className="w-10 h-10 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-sm hover:bg-[#008f6e] transition flex-shrink-0">
+                        <i className="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                ) : (
+                    <div className="w-10 h-10 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-sm flex-shrink-0">
+                        <i className="fa-solid fa-microphone text-sm"></i>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
+
 
 // MAIN APP COMPONENT
 const App = () => {
