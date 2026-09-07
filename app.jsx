@@ -328,67 +328,18 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
         let rec = {};
         if (ans.acneType === "Red pimples" || ans.extra === "Skin feels painful") {
             rec = {
-                title: "Active spot breakout",
-                benefit: "Gives daily barrier support while the patch handles targeted spot treatment.",
+                title: "Active Spot Breakout Routine",
+                benefit: "The Power Patch targets active spots directly — absorbing impurities and reducing inflammation overnight.",
                 products: [
                     {
-                        name: "Step 1 (Repair): Cetaphil Moisturising Lotion",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Cetaphil-Moisturising-Lotion-Moisturizer-Dermatologist/dp/B0GHXYQ318?mcid=5152507b9fa83491b3332a5931c7d83a&tag=googleshopdes-21&linkCode=df0&hvadid=725812251772&hvpos=undefined&hvnetw=g&hvrand=4429455602087908389&hvpone=undefined&hvptwo=undefined&hvqmt=undefined&hvdev=c&hvdvcmdl=undefined&hvlocint=undefined&hvlocphy=9226417&hvtargid=pla-2465883899495&hvocijid=4429455602087908389-B0GHXYQ318-&hvexpln=0&th=1" },
-                            { name: "Blinkit", url: "https://blinkit.com/prn/cetaphil-body-lotion/prid/744088" }
-                        ]
-                    },
-                    {
-                        name: "Step 2 (Treat): Benzac Power Patch",
+                        name: "Step 1: Benzac Power Patch",
                         links: [
                             { name: "Amazon", url: "https://www.amazon.in/Benzac-Fast-Acting-Ultra-Thin-Invisible-Dermatologist-Tested/dp/B0F23YL442" },
                             { name: "Zepto", url: "https://www.zepto.com/pn/benzac-power-fast-acting-pimple-patch/pvid/f828cef4-77f3-4fb6-ac82-1c751d459019" }
                         ]
-                    }
-                ]
-            };
-        } else if (ans.extra === "Marks after pimples") {
-            rec = {
-                title: "Post-acne marks",
-                benefit: "SPF stops healing skin from darkening into stubborn post-acne marks.",
-                products: [
-                    {
-                        name: "Step 1 (Repair): Cetaphil Sun SPF 50+ Light Gel",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Cetaphil-Very-High-Protection-Light/dp/B07G7L7SQP?th=1" },
-                            { name: "Zepto", url: "https://www.zepto.com/uncl/cetaphil/1747c030-4f20-4312-98cd-e80d776c853d" }
-                        ]
                     },
                     {
-                        name: "Step 2 (Treat): Benzac Power Patch Skin Restore",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/s?k=Benzac+Power+Patch+Skin+Restore" },
-                            { name: "Zepto", url: "https://www.zeptonow.com/search?query=Benzac%20Power%20Patch%20Skin%20Restore" }
-                        ]
-                    }
-                ]
-            };
-        } else if (ans.skinType === "Dry") {
-            rec = {
-                title: "Acne + dryness",
-                benefit: "Restores barrier moisture that daily salicylic acid use tends to strip away.",
-                products: [
-                    {
-                        name: "Step 1 (Repair): Cetaphil Moisturising Lotion",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Cetaphil-Moisturising-Lotion-Moisturizer-Dermatologist/dp/B0GHXYQ318?mcid=5152507b9fa83491b3332a5931c7d83a&tag=googleshopdes-21&linkCode=df0&hvadid=725812251772&hvpos=undefined&hvnetw=g&hvrand=4429455602087908389&hvpone=undefined&hvptwo=undefined&hvqmt=undefined&hvdev=c&hvdvcmdl=undefined&hvlocint=undefined&hvlocphy=9226417&hvtargid=pla-2465883899495&hvocijid=4429455602087908389-B0GHXYQ318-&hvexpln=0&th=1" },
-                            { name: "Blinkit", url: "https://blinkit.com/prn/cetaphil-body-lotion/prid/744088" }
-                        ]
-                    },
-                    {
-                        name: "Step 2 (Treat): Benzac AC 5% Gel Wash",
-                        links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Benzac-Ac-5-Bottle-100ml/dp/B0CD1RSQLT" },
-                            { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-bottle-of-100-ml-gel-wash/prid/666922" }
-                        ]
-                    },
-                    {
-                        name: "Step 3 (Treat): Benzac AC 2.5% Gel",
+                        name: "Step 2: Benzac AC 2.5% Gel (PM)",
                         links: [
                             { name: "Amazon", url: "https://www.amazon.in/BENZAC-AC-2-5-Tube-Gel/dp/B09V3SWKM5" },
                             { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-2.5-tube-of-30gm-gel/prid/647788" }
@@ -396,34 +347,69 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                     }
                 ]
             };
-        } else {
+        } else if (ans.extra === "Marks after pimples") {
             rec = {
-                title: "Full beginner routine",
-                benefit: "Complete AM/PM routine: Benzac treats the acne, Cetaphil repairs the barrier.",
+                title: "Post-Acne Marks Routine",
+                benefit: "The Skin Restore Patch fades dark marks left behind by pimples, working gently while you sleep.",
                 products: [
                     {
-                        name: "Step 1 (Repair): Cetaphil Moisturising Lotion",
+                        name: "Step 1: Benzac Power Patch Skin Restore",
                         links: [
-                            { name: "Amazon", url: "https://www.amazon.in/Cetaphil-Moisturising-Lotion-Moisturizer-Dermatologist/dp/B0GHXYQ318?mcid=5152507b9fa83491b3332a5931c7d83a&tag=googleshopdes-21&linkCode=df0&hvadid=725812251772&hvpos=undefined&hvnetw=g&hvrand=4429455602087908389&hvpone=undefined&hvptwo=undefined&hvqmt=undefined&hvdev=c&hvdvcmdl=undefined&hvlocint=undefined&hvlocphy=9226417&hvtargid=pla-2465883899495&hvocijid=4429455602087908389-B0GHXYQ318-&hvexpln=0&th=1" },
-                            { name: "Blinkit", url: "https://blinkit.com/prn/cetaphil-body-lotion/prid/744088" }
+                            { name: "Amazon", url: "https://www.amazon.in/s?k=Benzac+Power+Patch+Skin+Restore" },
+                            { name: "Zepto", url: "https://www.zeptonow.com/search?query=Benzac%20Power%20Patch%20Skin%20Restore" }
                         ]
                     },
                     {
-                        name: "Step 2 (Treat): Benzac AC 5% Gel Wash",
+                        name: "Step 2: Benzac AC 5% Gel Wash (AM)",
+                        links: [
+                            { name: "Amazon", url: "https://www.amazon.in/Benzac-Ac-5-Bottle-100ml/dp/B0CD1RSQLT" },
+                            { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-bottle-of-100-ml-gel-wash/prid/666922" }
+                        ]
+                    }
+                ]
+            };
+        } else if (ans.skinType === "Dry") {
+            rec = {
+                title: "Gentle Acne Routine (Dry Skin)",
+                benefit: "The gentler 2.5% formula treats acne without over-drying, ideal for skin that's already feeling tight.",
+                products: [
+                    {
+                        name: "Step 1: Benzac AC 2.5% Gel (PM)",
+                        links: [
+                            { name: "Amazon", url: "https://www.amazon.in/BENZAC-AC-2-5-Tube-Gel/dp/B09V3SWKM5" },
+                            { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-2.5-tube-of-30gm-gel/prid/647788" }
+                        ]
+                    },
+                    {
+                        name: "Step 2: Benzac Power Patch (for active spots)",
+                        links: [
+                            { name: "Amazon", url: "https://www.amazon.in/Benzac-Fast-Acting-Ultra-Thin-Invisible-Dermatologist-Tested/dp/B0F23YL442" },
+                            { name: "Zepto", url: "https://www.zepto.com/pn/benzac-power-fast-acting-pimple-patch/pvid/f828cef4-77f3-4fb6-ac82-1c751d459019" }
+                        ]
+                    }
+                ]
+            };
+        } else {
+            rec = {
+                title: "Full Benzac AM/PM Routine",
+                benefit: "A complete routine — cleanse, treat, and patch — gives your skin the best chance to clear up fast.",
+                products: [
+                    {
+                        name: "Step 1: Benzac AC 5% Gel Wash (AM Cleanser)",
                         links: [
                             { name: "Amazon", url: "https://www.amazon.in/Benzac-Ac-5-Bottle-100ml/dp/B0CD1RSQLT" },
                             { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-bottle-of-100-ml-gel-wash/prid/666922" }
                         ]
                     },
                     {
-                        name: "Step 3 (Treat): Benzac AC 5% Gel",
+                        name: "Step 2: Benzac AC 5% Gel (PM Treatment)",
                         links: [
                             { name: "Amazon", url: "https://www.amazon.in/BENZAC-AC-5-Tube-Gel/dp/B09V3SXW86" },
                             { name: "Blinkit", url: "https://blinkit.com/prn/benzac-ac-5-gel/prid/646589" }
                         ]
                     },
                     {
-                        name: "Step 4 (Treat): Benzac Power Patch",
+                        name: "Step 3: Benzac Power Patch (overnight)",
                         links: [
                             { name: "Amazon", url: "https://www.amazon.in/Benzac-Fast-Acting-Ultra-Thin-Invisible-Dermatologist-Tested/dp/B0F23YL442" },
                             { name: "Zepto", url: "https://www.zepto.com/pn/benzac-power-fast-acting-pimple-patch/pvid/f828cef4-77f3-4fb6-ac82-1c751d459019" }
@@ -513,7 +499,7 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                             setMessages(prev => [
                                 ...prev, 
                                 { id: Date.now(), type: 'bot', isCard: true, cardType: 'baseline', score: 58 },
-                                { id: Date.now(), type: 'bot', text: `I know dealing with breakouts can be really frustrating, especially when they just won't budge. But don't worry, we're in this together! 💕\n\nBased on your skin profile (${answers.skinType || "normal"}, ${answers.acneType || "breakouts"}), here is a personalized routine to help your skin heal without irritation:\n\n✨ **${rec.title}**\n\n${productString}\n\n**Why this works:** ${rec.benefit}`, options: ["Simulate Next Day"] }
+                                { id: Date.now(), type: 'bot', text: `I know dealing with breakouts can be really frustrating, especially when they just won't budge. But hey — you took the first step, and that matters! 💕\n\nBased on everything you've shared, here's a personalised Benzac routine I'd recommend to help your skin heal:\n\n✨ **${rec.title}**\n\n${productString}\n\n**Why this works:** ${rec.benefit}\n\nStart with this routine and we'll check in every day. Small steps lead to big changes! 🌟`, options: ["Simulate Next Day"] }
                             ]);
                         }, 3000);
                     } else {
@@ -596,7 +582,7 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
             <div className="bg-[#075e54] text-white px-4 py-3 flex items-center gap-3 shadow-md z-10">
                 <i className="fa-solid fa-arrow-left"></i>
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
-                    <img src="https://logodix.com/logo/2034925.jpg" alt="Benzac" className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://via.placeholder.com/40x40.png?text=BB'; }}/>
+                    <img src="buddy_dp.jpg" alt="Benzac Buddy" className="w-full h-full object-cover" />
                 </div>
                 <div>
                     <h1 className="font-semibold text-lg leading-tight">Benzac Buddy 🤖</h1>
