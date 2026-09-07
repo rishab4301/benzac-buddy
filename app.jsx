@@ -320,7 +320,7 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
     const [pendingNextStep, setPendingNextStep] = useState(null);
 
     const QUESTIONS = [
-        { id: 1, text: "Hi! I'm Benzac Buddy, your AI Acne Coach. Let's start your clear skin journey. Ready for your first skin scan?", options: ["Ready!"], key: 'ready' },
+        { id: 1, text: "Hi! I'm Benzac Buddy, your AI Acne Coach. Let's start your clear skin journey. Ready for your first skin scan?", options: ["Ready!"], key: 'ready', noOther: true },
         { id: 2, text: "Where are your breakouts?\nThis helps identify acne pattern and severity.", options: ["Forehead", "Cheeks", "Chin", "Nose", "Jawline", "Multiple areas"], key: 'area' },
         { id: 3, text: "What does your acne look like today?\nBuddy matches Benzac products based on acne stage.", options: ["Small bumps", "Whiteheads", "Blackheads", "Red pimples", "Painful acne"], key: 'acneType' },
         { id: 4, text: "How would you describe your skin?\nNeeded for cleanser and routine recommendations.", options: ["Dry", "Normal", "Combination", "Oily", "Very Oily"], key: 'skinType' },
@@ -634,8 +634,8 @@ const WhatsAppView = ({ setView, userData, setUserData }) => {
                                         {opt}
                                     </button>
                                 ))}
-                                {/* "Other" only for question messages (has a key), not special action buttons */}
-                                {msg.key && (
+                                {/* "Other" only for question messages (has a key and not marked noOther), not special action buttons */}
+                                {msg.key && !msg.noOther && (
                                     <button
                                         onClick={() => handleOtherClick(msg.key, msg)}
                                         className="bg-gray-50 border-2 border-gray-300 text-gray-600 font-semibold py-2 px-4 rounded-xl text-sm shadow-sm hover:bg-gray-100 transition text-left flex items-center gap-2">
